@@ -50,6 +50,10 @@ var getSlideStyle = function (spec) {
   return style;
 };
 
+var additionalInlineStyles = function(styles) {
+    console.log(styles);
+};
+
 var getKey = (child, fallbackKey) => {
     // key could be a zero
     return (child.key === null || child.key === undefined) ? fallbackKey : child.key;
