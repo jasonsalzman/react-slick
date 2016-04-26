@@ -79,7 +79,7 @@ var helpers = {
     var targetLeft, currentLeft;
     var callback;
 
-    if (this.props.waitForAnimate && this.state.animating) {
+    if (this.state.currentSlide === index) {
       return;
     }
 
@@ -109,6 +109,8 @@ var helpers = {
           this.props.afterChange(currentSlide);
         }
         ReactTransitionEvents.removeEndEventListener(ReactDOM.findDOMNode(this.refs.track).children[currentSlide], callback);
+
+        this.autoPlay();
       };
 
       this.setState({
@@ -122,7 +124,6 @@ var helpers = {
         this.props.beforeChange(this.state.currentSlide, currentSlide);
       }
 
-      this.autoPlay();
       return;
     }
 
@@ -141,7 +142,7 @@ var helpers = {
       } else if (this.state.slideCount % this.props.slidesToScroll !== 0) {
         currentSlide = 0;
       } else {
-        currentSlide = targetSlide - this.state.slideCount;
+        currentSlide = targetSlide % this.state.slideCount;
       }
     } else {
       currentSlide = targetSlide;
@@ -191,10 +192,12 @@ var helpers = {
       this.setState({
         currentSlide: currentSlide,
         trackStyle: getTrackCSS(assign({left: currentLeft}, this.props, this.state))
-      }, function () {
+      }, () => {
         if (this.props.afterChange) {
           this.props.afterChange(currentSlide);
         }
+
+        this.autoPlay();
       });
 
     } else {
@@ -212,22 +215,19 @@ var helpers = {
           this.props.afterChange(currentSlide);
         }
         ReactTransitionEvents.removeEndEventListener(ReactDOM.findDOMNode(this.refs.track), callback);
+
+        this.autoPlay();
       };
 
       this.setState({
         animating: true,
-        currentSlide: currentSlide,
+        currentSlide: targetSlide,
         trackStyle: getTrackAnimateCSS(assign({left: targetLeft}, this.props, this.state))
       }, function () {
         ReactTransitionEvents.addEndEventListener(ReactDOM.findDOMNode(this.refs.track), callback);
       });
 
     }
-
-    if (!this.state.autoPlayTimer) {
-      this.autoPlay();
-    }
-
   },
   swipeDirection: function (touchObject) {
     var xDist, yDist, r, swipeAngle;
@@ -252,21 +252,14 @@ var helpers = {
   autoPlay: function () {
     var play = () => {
       if (this.state.mounted) {
-        var nextIndex = this.props.rtl ?
-        this.state.currentSlide - this.props.slidesToScroll:
-        this.state.currentSlide + this.props.slidesToScroll;
-        this.slideHandler(nextIndex);
+        this.slideHandler(this.state.currentSlide + this.props.slidesToScroll);
       }
     };
     if (this.props.autoplay) {
+      window.clearTimeout(this.state.autoPlayTimer);
       this.setState({
-        autoPlayTimer: window.setInterval(play, this.props.autoplaySpeed)
+        autoPlayTimer: window.setTimeout(play, this.props.autoplaySpeed)
       });
-    }
-  },
-  pause: function () {
-    if (this.state.autoPlayTimer) {
-      window.clearInterval(this.state.autoPlayTimer);
     }
   }
 };

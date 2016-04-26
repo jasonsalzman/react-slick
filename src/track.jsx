@@ -17,7 +17,7 @@ var getSlideClasses = (spec) => {
   slickCloned = (index < 0) || (index >= spec.slideCount);
   if (spec.centerMode) {
     centerOffset = Math.floor(spec.slidesToShow / 2);
-    slickCenter = (index - spec.currentSlide) % spec.slideCount === 0;
+    slickCenter = (spec.currentSlide === index);
     if ((index > spec.currentSlide - centerOffset - 1) && (index <= spec.currentSlide + centerOffset)) {
       slickActive = true;
     }
@@ -50,15 +50,6 @@ var getSlideStyle = function (spec) {
   return style;
 };
 
-var additionalInlineStyles = function(styles) {
-    console.log(styles);
-};
-
-var getKey = (child, fallbackKey) => {
-    // key could be a zero
-    return (child.key === null || child.key === undefined) ? fallbackKey : child.key;
-};
-
 var renderSlides = (spec) => {
   var key;
   var slides = [];
@@ -79,12 +70,13 @@ var renderSlides = (spec) => {
 
     if (child.props.className) {
         cssClasses = classnames(slickClasses, child.props.className);
-    } else {
+    }
+    else {
         cssClasses = slickClasses;
     }
 
     slides.push(React.cloneElement(child, {
-      key: getKey(child, index),
+      key: index,
       'data-index': index,
       className: cssClasses,
       style: assign({}, child.props.style || {}, childStyle)
@@ -97,9 +89,9 @@ var renderSlides = (spec) => {
       if (index >= (count - infiniteCount)) {
         key = -(count - index);
         preCloneSlides.push(React.cloneElement(child, {
-          key: getKey(child, key),
+          key: key,
           'data-index': key,
-          className: cssClasses,
+          className: classnames(getSlideClasses(assign({index: key}, spec)), child.props.className),
           style: assign({}, child.props.style || {}, childStyle)
         }));
       }
@@ -107,9 +99,9 @@ var renderSlides = (spec) => {
       if (index < infiniteCount) {
         key = count + index;
         postCloneSlides.push(React.cloneElement(child, {
-          key: getKey(child, key),
+          key: key,
           'data-index': key,
-          className: cssClasses,
+          className: classnames(getSlideClasses(assign({index: key}, spec)), child.props.className),
           style: assign({}, child.props.style || {}, childStyle)
         }));
       }
