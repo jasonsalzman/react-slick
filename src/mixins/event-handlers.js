@@ -160,13 +160,15 @@ var EventHandlers = {
     }
   },
   onInnerSliderEnter: function (e) {
+    var self = this;
     if (this.props.autoplay && this.props.pauseOnHover) {
-      this.pause();
+      self.pause();
     }
   },
   onInnerSliderLeave: function (e) {
+    var self = this;
     if (this.props.autoplay && this.props.pauseOnHover) {
-      this.autoPlay();
+      self.autoPlay();
     }
   }
 };
