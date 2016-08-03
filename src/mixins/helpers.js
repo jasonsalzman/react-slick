@@ -1,7 +1,7 @@
 'use strict';
 
 import React from 'react';
-import ReactDOM from './ReactDOM';
+import ReactDOM from 'react-dom';
 import ReactTransitionEvents from 'react/lib/ReactTransitionEvents';
 import {getTrackCSS, getTrackLeft, getTrackAnimateCSS} from './trackHelper';
 import assign from 'object-assign';
@@ -79,7 +79,7 @@ var helpers = {
     var targetLeft, currentLeft;
     var callback;
 
-    if (this.state.currentSlide === index) {
+    if (this.props.waitForAnimate && this.state.animating) {
       return;
     }
 
@@ -106,11 +106,9 @@ var helpers = {
           animating: false
         });
         if (this.props.afterChange) {
-          this.props.afterChange(currentSlide);
+          this.props.afterChange(targetSlide);
         }
         ReactTransitionEvents.removeEndEventListener(ReactDOM.findDOMNode(this.refs.track).children[currentSlide], callback);
-
-        this.autoPlay();
       };
 
       this.setState({
@@ -121,9 +119,10 @@ var helpers = {
       });
 
       if (this.props.beforeChange) {
-        this.props.beforeChange(this.state.currentSlide, currentSlide);
+        this.props.beforeChange(this.state.currentSlide, targetSlide);
       }
 
+      this.autoPlay();
       return;
     }
 
@@ -142,7 +141,7 @@ var helpers = {
       } else if (this.state.slideCount % this.props.slidesToScroll !== 0) {
         currentSlide = 0;
       } else {
-        currentSlide = targetSlide % this.state.slideCount;
+        currentSlide = targetSlide - this.state.slideCount;
       }
     } else {
       currentSlide = targetSlide;
@@ -192,12 +191,10 @@ var helpers = {
       this.setState({
         currentSlide: currentSlide,
         trackStyle: getTrackCSS(assign({left: currentLeft}, this.props, this.state))
-      }, () => {
+      }, function () {
         if (this.props.afterChange) {
           this.props.afterChange(currentSlide);
         }
-
-        this.autoPlay();
       });
 
     } else {
@@ -215,19 +212,19 @@ var helpers = {
           this.props.afterChange(currentSlide);
         }
         ReactTransitionEvents.removeEndEventListener(ReactDOM.findDOMNode(this.refs.track), callback);
-
-        this.autoPlay();
       };
 
       this.setState({
         animating: true,
-        currentSlide: targetSlide,
+        currentSlide: currentSlide,
         trackStyle: getTrackAnimateCSS(assign({left: targetLeft}, this.props, this.state))
       }, function () {
         ReactTransitionEvents.addEndEventListener(ReactDOM.findDOMNode(this.refs.track), callback);
       });
 
     }
+
+    this.autoPlay();
   },
   swipeDirection: function (touchObject) {
     var xDist, yDist, r, swipeAngle;
@@ -250,21 +247,29 @@ var helpers = {
     return 'vertical';
   },
   autoPlay: function () {
+    if (this.state.autoPlayTimer) {
+      return;
+    }
     var play = () => {
       if (this.state.mounted) {
-        this.slideHandler(this.state.currentSlide + this.props.slidesToScroll);
+        var nextIndex = this.props.rtl ?
+        this.state.currentSlide - this.props.slidesToScroll:
+        this.state.currentSlide + this.props.slidesToScroll;
+        this.slideHandler(nextIndex);
       }
     };
     if (this.props.autoplay) {
-      window.clearTimeout(this.state.autoPlayTimer);
       this.setState({
-        autoPlayTimer: window.setTimeout(play, this.props.autoplaySpeed)
+        autoPlayTimer: window.setInterval(play, this.props.autoplaySpeed)
       });
     }
   },
   pause: function () {
     if (this.state.autoPlayTimer) {
       window.clearInterval(this.state.autoPlayTimer);
+      this.setState({
+        autoPlayTimer: null
+      });
     }
   }
 };
