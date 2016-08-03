@@ -271,7 +271,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  },
 	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-	    if (this.props.slickGoTo != nextProps.slickGoTo) {
+	    if (this.props.slickGoTo !== nextProps.slickGoTo || this.props.children && this.props.children[0].key !== nextProps.children[0].key) {
 	      this.changeSlide({
 	        message: 'index',
 	        index: nextProps.slickGoTo,
@@ -296,12 +296,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      speed: this.props.speed,
 	      infinite: this.props.infinite,
 	      centerMode: this.props.centerMode,
+	      focusOnSelect: this.props.focusOnSelect ? this.selectHandler : new Function(),
 	      currentSlide: this.state.currentSlide,
 	      lazyLoad: this.props.lazyLoad,
 	      lazyLoadedList: this.state.lazyLoadedList,
 	      rtl: this.props.rtl,
 	      slideWidth: this.state.slideWidth,
 	      slidesToShow: this.props.slidesToShow,
+	      slidesToScroll: this.props.slidesToScroll,
 	      slideCount: this.state.slideCount,
 	      trackStyle: this.state.trackStyle,
 	      variableWidth: this.props.variableWidth
@@ -406,7 +408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    } else if (options.message === 'next') {
 	      slideOffset = indexOffset === 0 ? this.props.slidesToScroll : indexOffset;
 	      targetSlide = this.state.currentSlide + slideOffset;
-	    } else if (options.message === 'dots') {
+	    } else if (options.message === 'dots' || options.message === 'children') {
 	      // Click on dots
 	      targetSlide = options.index * options.slidesToScroll;
 	      if (targetSlide === options.currentSlide) {
@@ -424,7 +426,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Accessiblity handler for previous and next
 	  keyHandler: function keyHandler(e) {},
 	  // Focus on selecting a slide (click handler on track)
-	  selectHandler: function selectHandler(e) {},
+	  selectHandler: function selectHandler(options) {
+	    this.changeSlide(options);
+	  },
 	  swipeStart: function swipeStart(e) {
 	    var touches, posX, posY;
 
@@ -462,7 +466,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, this.props, this.state));
 	    touchObject.curX = e.touches ? e.touches[0].pageX : e.clientX;
 	    touchObject.curY = e.touches ? e.touches[0].pageY : e.clientY;
-	    touchObject.swipeLength = Math.round(Math.sqrt(Math.pow(touchObject.curX - touchObject.startX, 2)));
+	    touchObject.swipeLength = Math.round(Math.abs(touchObject.curX - touchObject.startX));
 
 	    positionOffset = (this.props.rtl === false ? 1 : -1) * (touchObject.curX > touchObject.startX ? 1 : -1);
 
@@ -548,6 +552,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  },
 	  onInnerSliderLeave: function onInnerSliderLeave(e) {
+	    var self = this;
 	    if (this.props.autoplay && this.props.pauseOnHover) {
 	      this.autoPlay();
 	    }
