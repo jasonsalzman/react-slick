@@ -34,12 +34,13 @@ var SingleItem = React.createClass({
       <div>
         <h2> Single Item</h2>
         <Slider {...settings}>
-          <div onClick={this.click}><h3>{this.state.count}</h3></div>
-          <div><h3>2</h3></div>
-          <div><h3>3</h3></div>
-          <div><h3>4</h3></div>
-          <div><h3>5</h3></div>
-          <div><h3>6</h3></div>
+          <div key={1} onClick={this.click}><h3>{this.state.count}</h3></div>
+          <div key={2}><h3>2</h3></div>
+          <div key={3}><h3>3</h3></div>
+          <div key={4}><h3>4</h3></div>
+          <div key={5}><h3>5</h3></div>
+          <div key={6}><h3>6</h3></div>
+          {false? <div key={6}><h3>6</h3></div>: null}
         </Slider>
       </div>
     );
@@ -472,6 +473,47 @@ var SlickGoTo = React.createClass({
   }
 });
 
+var SampleNextArrow = React.createClass({
+  render: function() {
+    return <div {...this.props} style={{display: 'block', background: 'red'}}></div>;
+  }
+});
+
+var SamplePrevArrow = React.createClass({
+  render: function() {
+    return (
+      <div {...this.props} style={{display: 'block', background: 'red'}}></div>
+    );
+  }
+});
+
+var CustomArrows = React.createClass({
+  render: function () {
+    var settings = {
+      dots: true,
+      infinite: true,
+      slidesToShow: 3,
+      slidesToScroll: 1,
+      nextArrow: <SampleNextArrow />,
+      prevArrow: <SamplePrevArrow />
+    };
+    return (
+      <div>
+        <h2>Custom Arrows</h2>
+        <Slider {...settings}>
+          <div><h3>1</h3></div>
+          <div><h3>2</h3></div>
+          <div><h3>3</h3></div>
+          <div><h3>4</h3></div>
+          <div><h3>5</h3></div>
+          <div><h3>6</h3></div>
+        </Slider>
+      </div>
+    );
+  }
+});
+
+
 var App = React.createClass({
   render: function () {
     //need to add variable width and center mode demo
@@ -492,6 +534,7 @@ var App = React.createClass({
         <LazyLoad />
         <Fade />
         <SlickGoTo />
+        <CustomArrows />
       </div>
     );
   }

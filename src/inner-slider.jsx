@@ -60,8 +60,13 @@ export var InnerSlider = React.createClass({
     }
   },
   componentWillReceiveProps: function(nextProps) {
-    if (this.props.slickGoTo !== nextProps.slickGoTo
-      || (this.props.children && this.props.children[0].key !== nextProps.children[0].key)) {
+    var self = this;
+    if (this.props.forceResize != nextProps.forceResize){
+      setTimeout(function(){
+        self.onWindowResized();
+      }, 100);
+    }
+    if (this.props.slickGoTo !== nextProps.slickGoTo) {
       this.changeSlide({
           message: 'index',
           index: nextProps.slickGoTo,
@@ -101,7 +106,7 @@ export var InnerSlider = React.createClass({
 
     var dots;
 
-    if (this.props.dots === true && this.state.slideCount > this.props.slidesToShow) {
+    if (this.props.dots === true && this.state.slideCount >= this.props.slidesToShow) {
       var dotProps = {
         dotsClass: this.props.dotsClass,
         slideCount: this.state.slideCount,

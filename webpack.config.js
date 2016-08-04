@@ -1,6 +1,6 @@
 var webpack = require('webpack');
 var path = require('path');
-var autoprefixer = require('autoprefixer-core');
+var autoprefixer = require('autoprefixer');
 
 module.exports = {
   devtool: '#inline-source-map',
@@ -29,6 +29,9 @@ module.exports = {
   },
   postcss: [ autoprefixer({ browsers: ['last 2 version'] }) ],
   resolve: {
+    alias: {
+        react: __dirname + '/node_modules/react'
+    },
     extensions: ['', '.js', '.jsx']
   },
   plugins: [

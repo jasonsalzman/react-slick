@@ -6,3 +6,5 @@ demos/*
 demos1
 TODO.md
 npm-debug.log
+lib
+*.sublime-*
