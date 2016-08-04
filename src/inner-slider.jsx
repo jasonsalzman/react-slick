@@ -66,7 +66,8 @@ export var InnerSlider = React.createClass({
         self.onWindowResized();
       }, 100);
     }
-    if (this.props.slickGoTo !== nextProps.slickGoTo) {
+    if (this.props.slickGoTo !== nextProps.slickGoTo
+      || (this.props.children && this.props.children[0] && this.props.children[0].key !== nextProps.children[0].key)) {
       this.changeSlide({
           message: 'index',
           index: nextProps.slickGoTo,
