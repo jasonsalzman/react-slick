@@ -271,7 +271,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  },
 	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-	    if (this.props.slickGoTo !== nextProps.slickGoTo || this.props.children && this.props.children[0].key !== nextProps.children[0].key) {
+	    var self = this;
+	    if (this.props.forceResize != nextProps.forceResize) {
+	      setTimeout(function () {
+	        self.onWindowResized();
+	      }, 100);
+	    }
+	    if (this.props.slickGoTo !== nextProps.slickGoTo || this.props.children && this.props.children[0] && this.props.children[0].key !== nextProps.children[0].key) {
 	      this.changeSlide({
 	        message: 'index',
 	        index: nextProps.slickGoTo,
